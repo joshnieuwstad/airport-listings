@@ -135,7 +135,7 @@ export default function Listings({ Airports }: AirportResponse) {
                     (
                         <Loader />
                     ) :
-                    (
+                    matchedFlights.length ? (
                         <div>
                             <div className="text-2xl font-bold text-ts-green mb-6">
                                 Available Flights
@@ -145,6 +145,10 @@ export default function Listings({ Airports }: AirportResponse) {
                                     <Card flight={flight} airportMap={airportMap} key={flight.outboundFlight.id} />
                                 ))}
                             </div>
+                        </div>
+                    ) : (
+                        <div className="text-2xl font-bold text-ts-green mb-6">
+                            No Available Flights
                         </div>
                     )}
             </div>

@@ -11,7 +11,7 @@ interface CardProps {
 
 export default function Card({ flight, airportMap }: CardProps) {
 
-    const formatDate = (dateString: Date | string) => {
+    const formatDate = (dateString: Date | string): string => {
         const date = new Date(dateString);
         return new Intl.DateTimeFormat('en-GB', {
             day: '2-digit',
@@ -20,7 +20,7 @@ export default function Card({ flight, airportMap }: CardProps) {
         }).format(date)
     }
 
-    const formatPrice = (amount: number, currency = 'EUR') => {
+    const formatPrice = (amount: number, currency = 'EUR'): string => {
         return new Intl.NumberFormat('en-NL', {
             style: 'currency',
             currency,
