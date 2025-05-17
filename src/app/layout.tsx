@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Barlow } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
+const geistSans = Barlow({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  weight: "500"
 });
 
 const geistMono = Geist_Mono({
