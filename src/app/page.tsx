@@ -1,5 +1,5 @@
-import { Airport, AirportResponse } from "./models/airport.model";
-import Listings from "./pages/listings/page";
+import { Airport, AirportResponse } from "../models/airport.model";
+import Listings from "../components/Listings";
 
 export default async function Home() {
 

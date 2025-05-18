@@ -17,7 +17,7 @@ export default function Card({ flight, airportMap }: CardProps) {
             day: '2-digit',
             month: 'short',
             year: 'numeric',
-        }).format(date)
+        }).format(date);
     }
 
     const formatPrice = (amount: number, currency = 'EUR'): string => {
@@ -28,20 +28,20 @@ export default function Card({ flight, airportMap }: CardProps) {
     }
 
     const getTimeDifference = (startDate: string, endDate: string): string => {
-        const start = new Date(startDate)
-        const end = new Date(endDate)
+        const start = new Date(startDate);
+        const end = new Date(endDate);
 
-        const diffMs = end.getTime() - start.getTime() // difference in milliseconds
+        const diffMs = end.getTime() - start.getTime();
 
         if (isNaN(diffMs)) {
-            throw new Error('Invalid date input')
+            throw new Error('Invalid date input');
         }
 
-        const totalMinutes = Math.floor(diffMs / (1000 * 60))
-        const hours = Math.floor(totalMinutes / 60)
-        const minutes = totalMinutes % 60
+        const totalMinutes = Math.floor(diffMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
 
-        return `${hours}h ${minutes}m`
+        return `${hours}h ${minutes}m`;
     }
 
 
