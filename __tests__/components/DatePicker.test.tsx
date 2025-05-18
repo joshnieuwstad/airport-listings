@@ -29,4 +29,18 @@ describe(DatePicker, () => {
     fireEvent.change(input, { target: { value: '2023-10-01' } });
     expect(onChange).toHaveBeenCalled();
   });
+
+  it('should return nothing if no date is provided', () => {
+    const onChange = jest.fn();
+    render(<DatePicker
+      id="departureDate"
+      name="departureDate"
+      value={null}
+      onChange={onChange}
+      label="Departure Date"
+    />);
+    const input = screen.getByLabelText(/departure date/i);
+    fireEvent.change(input, { target: { value: 'invalid-date' } });
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

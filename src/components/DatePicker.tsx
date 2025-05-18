@@ -22,15 +22,20 @@ export default function DatePicker({
     return new Date(date).toISOString().slice(0, 10);
   };
 
-  const parseDate = (value: string): Date => {
-    return new Date(value);
+  const parseDate = (value: string): Date | null => {
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? null : parsed;
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement> | undefined) => {
     if (!e?.target) {
       return;
     }
-    onChange(parseDate(e.target.value))
+    const parsedDate = parseDate(e.target.value);
+    if (!parsedDate) {
+      return;
+    }
+    onChange(parsedDate);
   }
 
   return (
