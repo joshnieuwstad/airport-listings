@@ -11,6 +11,7 @@ import Loader from "@/components/Loader";
 import Card from "@/components/Card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import toast from "react-hot-toast";
 
 export default function Listings({ Airports }: AirportResponse) {
 
@@ -60,7 +61,9 @@ export default function Listings({ Airports }: AirportResponse) {
 
     const res = await fetch(`/api/flights?${params.toString()}`);
     if (!res.ok) {
-      throw new Error('Failed to fetch flights');
+      toast.error("Error fetching flights");
+      setLoading(false);
+      return;
     }
 
     const data: FlightResponse = await res.json();

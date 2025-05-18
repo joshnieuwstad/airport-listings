@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Listings from "../../src/components/Listings";
 import { Airport } from "@/models/airport.model";
 import { Flight, FlightResponse } from "@/models/listing-result.model";
+import toast from "react-hot-toast";
 
 const mockAirports: Airport[] = [
   { AirportName: "Amsterdam", ItemName: "AMS", Description: "Amsterdam Airport" },
@@ -10,6 +11,29 @@ const mockAirports: Airport[] = [
 ];
 
 let mockedFlightOffers: FlightResponse;
+
+const mockFetch = (response: any, status: number = 200, ok: boolean = true) => {
+  global.fetch = jest.fn().mockResolvedValue({
+    ok,
+    status,
+    json: () => Promise.resolve(response),
+  });
+}
+const setFormFieldsAndSubmit = () => {
+  fireEvent.change(screen.getByLabelText(/origin/i), {
+    target: { value: 'AMS' }
+  });
+
+  fireEvent.change(screen.getByLabelText(/destination/i), {
+    target: { value: 'RTM' }
+  });
+
+  fireEvent.change(screen.getByLabelText(/departure date/i), {
+    target: { value: '2025-06-01' }
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /search/i }));
+};
 
 
 jest.mock('@/components/Select', () => (props: any) => (
@@ -40,6 +64,11 @@ jest.mock('@/components/Card', () => (props: any) => (
   <div data-testid={props['data-testid'] || 'card'}>{props.children || 'Flight Card'}</div>
 ));
 
+jest.mock('react-hot-toast', () => ({
+  ...jest.requireActual('react-hot-toast'),
+  error: jest.fn(),
+}));
+
 describe("Listings component", () => {
   it("should render correctly", () => {
     render(<Listings Airports={mockAirports} />);
@@ -52,76 +81,28 @@ describe("Listings component", () => {
 });
 
 describe('Listings form submission', () => {
-  beforeEach(() => {
+  it('should submit the form when all fields are valid and call fetch', async () => {
     mockedFlightOffers = {
       resultSet: { count: 2 },
       flightOffer: [
         {
           outboundFlight: {
             id: 'flight-1',
-            departureDateTime: '2025-06-01T08:00:00Z',
-            arrivalDateTime: '2025-06-01T10:00:00Z',
-            marketingAirline: { companyShortName: 'KLM' },
-            flightNumber: 123,
-            departureAirport: { locationCode: 'AMS' },
-            arrivalAirport: { locationCode: 'CDG' },
           },
-          pricingInfoSum: {
-            totalPriceAllPassengers: 200,
-            totalPriceOnePassenger: 100,
-            baseFare: 80,
-            taxSurcharge: 20,
-            currencyCode: 'EUR',
-            productClass: 'Economy',
-          },
-          deeplink: { href: 'https://example.com/booking' },
-        },
+        } as Flight,
         {
           outboundFlight: {
             id: 'flight-2',
-            departureDateTime: '2025-06-01T12:00:00Z',
-            arrivalDateTime: '2025-06-01T14:00:00Z',
-            marketingAirline: { companyShortName: 'Transavia' },
-            flightNumber: 456,
-            departureAirport: { locationCode: 'AMS' },
-            arrivalAirport: { locationCode: 'CDG' },
           },
-          pricingInfoSum: {
-            totalPriceAllPassengers: 250,
-            totalPriceOnePassenger: 125,
-            baseFare: 100,
-            taxSurcharge: 25,
-            currencyCode: 'EUR',
-            productClass: 'Economy',
-          },
-          deeplink: { href: 'https://example.com/booking2' },
-        },
+        } as Flight,
       ],
     };
 
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: () => Promise.resolve(mockedFlightOffers)
-    });
-  });
+    mockFetch(mockedFlightOffers);
 
-  it('should submit the form when all fields are valid and calls fetch', async () => {
-    render(<Listings Airports={mockAirports} />)
+    render(<Listings Airports={mockAirports} />);
 
-    fireEvent.change(screen.getByLabelText(/origin/i), {
-      target: { value: 'AMS' }
-    });
-
-    fireEvent.change(screen.getByLabelText(/destination/i), {
-      target: { value: 'RTM' }
-    });
-
-    fireEvent.change(screen.getByLabelText(/departure date/i), {
-      target: { value: '2025-06-01' }
-    });
-
-    fireEvent.click(screen.getByRole('button', { name: /search/i }));
+    setFormFieldsAndSubmit();
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
@@ -132,32 +113,65 @@ describe('Listings form submission', () => {
   });
 
   it('should not submit the form when fields are invalid', async () => {
-    render(<Listings Airports={mockAirports} />);
+    mockedFlightOffers = {
+      resultSet: { count: 2 },
+      flightOffer: [
+        {
+          outboundFlight: {
+            id: 'flight-1',
+          },
+        } as Flight,
+        {
+          outboundFlight: {
+            id: 'flight-2',
+          },
+        } as Flight,
+      ],
+    };
 
-    fireEvent.click(screen.getByRole('button', { name: /search/i }));
+    mockFetch(mockedFlightOffers);
+
+    render(<Listings Airports={mockAirports} />);
 
     await waitFor(() => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
   });
 
+  it('should show toast message when fetch fails', async () => {
+    mockedFlightOffers = {
+      resultSet: { count: 2 },
+      flightOffer: [
+        {
+          outboundFlight: {
+            id: 'flight-1',
+          },
+        } as Flight,
+        {
+          outboundFlight: {
+            id: 'flight-2',
+          },
+        } as Flight,
+      ],
+    };
+
+    mockFetch(mockedFlightOffers, 500, false);
+
+    render(<Listings Airports={mockAirports} />);
+
+    setFormFieldsAndSubmit();
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
+      expect(toast.error).toHaveBeenCalledWith('Error fetching flights');
+    });
+  });
+
   it('should show loading state when fetching', async () => {
     render(<Listings Airports={mockAirports} />);
 
-    fireEvent.change(screen.getByLabelText(/origin/i), {
-      target: { value: 'AMS' }
-    });
-
-    fireEvent.change(screen.getByLabelText(/destination/i), {
-      target: { value: 'RTM' }
-    });
-
-    fireEvent.change(screen.getByLabelText(/departure date/i), {
-      target: { value: '2025-06-01' }
-    });
-
-    fireEvent.click(screen.getByRole('button', { name: /search/i }));
+    setFormFieldsAndSubmit();
 
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
-})
+});
