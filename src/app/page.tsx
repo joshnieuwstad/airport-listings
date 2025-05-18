@@ -1,5 +1,6 @@
 import { Airport, AirportResponse } from "../models/airport.model";
 import Listings from "../components/Listings";
+import Header from "@/components/Header";
 
 export default async function Home() {
 
@@ -9,11 +10,7 @@ export default async function Home() {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="bg-ts-green text-white py-16 px-6 text-center">
-        <h1 className="text-4xl font-bold">
-          Where do you want to go?
-        </h1>
-      </div>
+      <Header />
       <div className="px-12 max-w-5-xl mx-auto">
         <Listings Airports={airports}></Listings>
       </div>
