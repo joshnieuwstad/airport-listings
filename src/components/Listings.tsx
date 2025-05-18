@@ -25,15 +25,15 @@ export default function Listings({ Airports }: AirportResponse) {
 
   const airportMap = useAirportMap(Airports);
 
-  const handleDateChange = (e: Date) => setFormData((prev) => ({
-    ...prev,
-    departureDate: e
-  }))
-
   const airportOptions = Airports.map((airport) => ({
     key: airport.ItemName,
     value: airport.ItemName,
     label: `${airport.AirportName} ${airport.ItemName}`
+  }));
+
+  const handleDateChange = (e: Date) => setFormData((prev) => ({
+    ...prev,
+    departureDate: e
   }));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -48,7 +48,8 @@ export default function Listings({ Airports }: AirportResponse) {
     setLoading(true);
 
     const { origin, destination, departureDate } = formData;
-    if (!departureDate) {
+    if (!departureDate || !origin || !destination) {
+      setLoading(false);
       return;
     }
     const params = new URLSearchParams({
@@ -81,6 +82,7 @@ export default function Listings({ Airports }: AirportResponse) {
               label="Origin"
               name="origin"
               placeholder="Select an airport"
+              required
               value={formData.origin}
               onChange={handleChange}
               options={airportOptions}
@@ -93,6 +95,7 @@ export default function Listings({ Airports }: AirportResponse) {
               label="Destination"
               name="destination"
               placeholder="Select an airport"
+              required
               value={formData.destination}
               onChange={handleChange}
               options={airportOptions}
@@ -121,6 +124,7 @@ export default function Listings({ Airports }: AirportResponse) {
         </div>
       </form>
       <div className="max-w-6xl mx-auto p-4 md:px-6 md:py-14">
+        {loading}, {requestSent}
         {loading ?
           (
             <Loader />
@@ -132,7 +136,7 @@ export default function Listings({ Airports }: AirportResponse) {
               </div>
               <div className="grid md:grid-cols-3 gap-6">
                 {matchedFlights.map((flight) => (
-                  <Card flight={flight} airportMap={airportMap} key={flight.outboundFlight.id} />
+                  <Card flight={flight} airportMap={airportMap} key={flight.outboundFlight.id} data-testid="card" />
                 ))}
               </div>
             </div>

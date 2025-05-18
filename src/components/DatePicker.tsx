@@ -16,7 +16,7 @@ export default function DatePicker({
   onChange
 }: DatePickerProps) {
   const formatDate = (date: Date | null): string => {
-    if (!date) {
+    if (!date || isNaN(date.getTime())) {
       return '';
     }
     return new Date(date).toISOString().slice(0, 10);

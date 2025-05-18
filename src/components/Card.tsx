@@ -46,7 +46,7 @@ export default function Card({ flight, airportMap }: CardProps) {
 
 
   return (
-    <div className="bg-white shadow-md rounded-xl p-5 transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+    <div className="bg-white shadow-md rounded-xl p-5 transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1" data-testid="card">
       <div className="flex items-center mb-4">
         <div className="w-8 h-8 bg-ts-green bg-opacity-10 rounded-full flex items-center justify-center mr-3">
           <FontAwesomeIcon icon={faPlane} className="text-white" />
