@@ -33,10 +33,6 @@ export default function Card({ flight, airportMap }: CardProps) {
 
     const diffMs = end.getTime() - start.getTime();
 
-    if (isNaN(diffMs)) {
-      throw new Error('Invalid date input');
-    }
-
     const totalMinutes = Math.floor(diffMs / (1000 * 60));
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
